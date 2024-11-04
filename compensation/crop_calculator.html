@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Calculator</title>
+    <style>
+        /* CSS styles for the video background */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            overflow-y: scroll; /* Added web viewer scroll */
+        }
+        
+        #video-bg {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+        }
+
+        /* CSS styles for the form */
+        .container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 70px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 18px;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        input[type="submit"], #undoBtn {
+            width: 49%;
+            padding: 10px;
+            font-size: 18px;
+            background: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover, #undoBtn:hover {
+            background: #45a049;
+        }
+
+        #undoBtn {
+            float: right;
+        }
+
+        /* CSS styles for table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        /* CSS styles for Excel export button */
+        #exportBtn {
+            width: 100%;
+            padding: 10px;
+            font-size: 18px;
+            background: #008CBA;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        #exportBtn:hover {
+            background: #00688B;
+        }
+
+        /* CSS styles for scrollable container */
+        #scrollable-container {
+            max-height: 300px; /* Set the maximum height here */
+            overflow-y: auto; /* Enable vertical scrolling */
+            margin-bottom: 20px; /* Add some space below the table */
+        }
+    </style>
+</head>
+<body>
+    <!-- Video background -->
+    <video autoplay muted loop id="video-bg">
+        <source src="cropbackgvideo.mp4" type="video/mp4">
+        Your browser does not support HTML5 video.
+    </video>
+
+    <!-- Form -->
+    <div class="container">
+        <h1>Crop Calculator</h1>
+        <form id="cropForm">
+            <div class="form-group">
+                <label for="owner">Owner:</label>
+                <input type="text" id="owner" name="owner">
+            </div>
+            <div class="form-group">
+                <label for="cropSelect">Select Crop/Plant:</label>
+                <select id="cropSelect">
+                    <!-- Crop options will be populated here -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="seedling">Seedling:</label>
+                <input type="number" id="seedling" name="seedling" placeholder="Enter total number of seedling crops/plants">
+            </div>
+            <div class="form-group">
+                <label for="small">Small:</label>
+                <input type="number" id="small" name="small" placeholder="Enter total number of small crops/plants">
+            </div>
+            <div class="form-group">
+                <label for="medium">Medium:</label>
+                <input type="number" id="medium" name="medium" placeholder="Enter total number of medium crops/plants">
+            </div>
+            <div class="form-group">
+                <label for="mature">Mature:</label>
+                <input type="number" id="mature" name="mature" placeholder="Enter total number of mature crops/plants">
+            </div>
+            <div class="form-group">
+                <label for="inflationRate">Inflation Rate:</label>
+                <input type="number" id="inflationRate" name="inflationRate" step="0.01" placeholder="Input inflation rate to adjust crop/plant rate">
+            </div>
+            <input type="submit" value="Submit">
+            <input type="button" id="undoBtn" value="Undo">
+        </form>
+    </div>
+
+    <!-- Table for display -->
+    <div class="container" id="scrollable-container">
+        <table id="cropTable">
+            <thead>
+                <tr>
+                    <th>Owner</th>
+                    <th>Crop Name</th>
+                    <th>Seedling</th>
+                    <th>Small</th>
+                    <th>Medium</th>
+                    <th>Mature</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Displayed data will be populated here -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Total Crops Display -->
+    <div class="container" id="total-container">
+        <p>Total Value of Crops: <span id="totalCrops">0.00</span></p>
+    </div>
+
+    <!-- Export to Excel button -->
+    <button id="exportBtn">Export to Excel</button>
+
+    <!-- JavaScript code for form submission, undo, table display, and Excel export -->
+    <script>
+
+        const cropData = `CROPS &PLANTS,SEEDLING ,SMALL,MEDIUM,MATURE
+Avocado (Butter),K2.00,K8.00,K15.00,K20.00
+Aibika (Edible leaves - greens),K0.00,K0.65,K1.30,K2.60
+Bamboo (edible shoots),K0.00,K4.50,K9.00,K19.50
+Bamboo (used as builing material),K0.00,K6.50,K13.00,K26.00
+Bamboo (used as cooking pots),K0.00,K4.60,K9.00,K19.50
+Bamboo (wild-scrambling or small clump),K0.00,K0.00,K0.00,K13.00
+Banana (All Species),K0.40,K2.00,K5.50,K10.50
+Banana (clumps),K4.00,K6.50,K13.00,K26.00
+Bean (all species),K0.00,K0.25,K0.65,K1.30
+Betelnut (Areca) Palm,K2.60,K6.50,K13.00,K26.00
+Betelnut (Highlands),K1.00,K1.50,K3.00,K5.00
+Betel Pepper (Daka plant - Highlands),K0.50,K1.00,K1.50,K3.00
+Betel Pepper (Daka plant - Lowlands),K0.50,K1.00,K1.50,K3.00
+Black Kumu (edible greens),K0.00,K0.15,K0.40,K0.65
+Black Palm (Limbun),K0.80,K2.50,K6.00,K12.00
+Breadfruit Tree (edible fruit),K2.60,K9.00,K19.50,K26.00
+Breadfruit Tree (kapiak - edible leaves),K1.30,K4.00,K8.00,K12.00
+Brocccoli,K0.00,K0.65,K1.30,K2.60
+Cabbage (Chinese),K0.00,K0.40,K0.65,K1.30
+Cabbage (Round),K0.00,K0.65,K1.30,K2.60
+Capsicum (bell pepper),K0.00,K0.25,K0.65,K1.30
+Cardamon (split),K0.80,K2.50,K6.50,K13.00
+Carrots,K0.00,K0.25,K0.65,K1.30
+Cassava (clump, edible),K0.00,K0.40,K1.30,K2.60
+Cauliflower,K0.00,K0.65,K1.30,K2.60
+Cashew Nut Tree (kidney shape edible nut),K1.00,K5.00,K8.00,K15.50
+Castanopis,K1.00,K3.00,K10.00,K20.00
+Casuarina Tree,K1.30,K4.00,K10.50,K21.00
+Cherry Tree (small soft round stone fruit),K0.30,K0.70,K1.10,K2.60
+Chestnut Tree (glossy hard brown edible fruit),K0.40,K1.60,K2.60,K4.00
+Chilli (birds eye),K0.00,K0.25,K0.65,K1.30
+Choko (vine),K0.00,K0.65,K2.00,K4.00
+Cinnamon,K0.80,K2.00,K4.50,K10.00
+Citrus Tree (Lemon),K0.40,K1.60,K4.00,K10.50
+Citrus Tree (Mandarin),K0.80,K2.60,K8.00,K16.00
+Citrus Tree (Orange),K0.80,K2.60,K8.00,K16.00
+Citrus Tree (Pomelo),K0.40,K1.60,K4.00,K8.00
+Cocoa Tree (conventional),K2.00,K5.25,K10.50,K21.00
+Cocoa Tree (hybrid),K2.60,K6.50,K15.50,K31.50
+Cocoa Tree (budded),K4.00,K8.00,K16.00,K33.00
+Coconut Palm (conventional),K2.60,K6.50,K15.50,K31.50
+Coconut Palm (hybrid),K4.00,K9.00,K22.50,K46.00
+Coffee (Arabica),K1.50,K3.50,K7.00,K14.00
+Coffee (Robusta),K1.00,K2.50,K5.50,K11.00
+Corn (maize),K0.00,K0.25,K0.65,K1.30
+Cucumber (vine),K0.00,K0.25,K1.05,K2.00
+Custard Apple,K0.15,K0.20,K0.80,K2.60
+Egg plant,K0.00,K0.25,K1.05,K2.00
+English potato,K0.00,K1.30,K2.60,K5.20
+Fern plant (edible leaves),K0.15,K0.65,K1.30,K2.60
+Fern Tree (edible leaves),K0.00,K0.70,K1.30,K2.60
+Fig Tree,K1.00,K4.00,K7.00,K10.00
+Five Corner Fruit,K0.10,K0.40,K1.00,K2.60
+Flax (Sisal - rope making),K0.15,K0.40,K1.30,K2.60
+Galip Nut Tree,K0.80,K2.60,K6.50,K13.00
+Ginger (clump),K0.00,K0.15,K0.40,K0.65
+Green vegetables (mixed),,,,K2.00
+Guava Fruit,K1.00,K4.00,K7.00,K10.00
+Kapok Tree,K0.25,K0.65,K1.30,K4.00
+Kava,K2.00,K5.00,K10.50,K19.50
+Kumu Mosong Tree (edible leaves),K0.40,K0.65,K2.00,K4.00
+Kunai Grass,,,,K40.00
+Laportia (Salat leaf pain relief),K0.00,K0.15,K0.25,K0.40
+Lemon Grass,,,,K1.30
+Lettuce,K0.00,K0.65,K1.05,K2.00
+Malay Apple Tree (Laulau),K1.30,K4.00,K5.00,K10.50
+Mango Tree (edible fruit),K1.30,K4.00,K9.00,K24.00
+Mangrove Tree (used a building material),K0.40,K1.30,K4.00,K6.50
+Mat Weavinng Plant,,,,K0.10
+Mon Tree (small round edible fruit),K0.25,K0.70,K1.60,K4.00
+Mumu Leaves (used for wrapping food, roofing etc),K0.00,K1.30,K2.60,K4.00
+Nipa Palm (large),K0.25,K0.70,K2.00,K4.00
+Nipa Palm (small),K0.15,K0.40,K1.00,K2.00
+Noni Tree,K2.00,K5.00,K10.00,K20.00
+Nutmeg,K0.80,K4.00,K7.00,K10.00
+Oenanthe,,,,K0.60
+Oil Palm,K2.00,K5.00,K13.00,K26.00
+Okari Tree (edible nut),K0.80,K5.50,K7.00,K13.00
+Onion (round),K0.00,K0.65,K1.05,K1.30
+Onion (spring),K0.00,K0.15,K0.40,K0.65
+Orchid Plants (cultivated),K0.25,K0.70,K2.00,K4.00
+Pandanus Palm (Karuka edible nut) Coastal,K0.80,K2.60,K5.00,K8.00
+Pandanus Palm (Karuka edible nut) Highlands,K2.60,K9.00,K19.00,K26.00
+Pandanus Palm (Marita edible nut),K0.50,K2.00,K5.00,K18.00
+Pandanus Palm (non edible),K0.40,K1.30,K3.30,K5.20
+Pao (Barringtonia species edible nut),K0.30,K0.70,K1.60,K4.00
+Passionfruit/Sugarfruit (vine),K0.00,K0.25,K0.65,K1.30
+Pawpaw,K0.15,K0.40,K1.30,K3.30
+Peanut,K0.00,K0.15,K0.40,K0.65
+Pineapple,K0.00,K0.65,K2.60,K4.00
+Pitpit,K0.00,K1.05,K2.00,K4.00
+Pitpit (Highlands),K0.00,K0.65,K1.30,K2.60
+Pitpit (wild),K0.00,K0.15,K0.25,K0.40
+Poison Roots (vines),K0.15,K0.25,K0.70,K1.30
+Pumpkin (vine),K0.00,K0.40,K1.30,K2.60
+Putty (gluey juice),K0.15,K0.25,K0.70,K1.30
+Pyrethrum,K0.40,K1.30,K2.60,K6.50
+Radish (edible root),K0.00,K0.25,K0.65,K1.30
+Rambutan Fruit,K1.30,K2.60,K5.20,K9.00
+Rattan Cane,K0.00,K1.30,K3.30,K6.50
+Rice,,,,K0.20
+Rubber Tree,K0.00,K4.00,K8.00,K19.50
+Rungia,K0.00,K0.25,K0.40,K0.70
+Sago (edible),K0.00,K9.20,K19.50,K40.00
+Sago (non edible),K0.00,K6.50,K13.00,K26.00
+Sago (wild/covering large area),,,,K160.00
+Seaweed/seagrass,,,,K0.20
+Sorghum,,,,K0.20
+Soursop Fruit,K0.70,K2.20,K4.50,K8.00
+Soya Bean,K0.00,K0.25,K0.40,K0.70
+Strawberry (Pulpy Red Berry),K0.00,K0.25,K0.65,K1.30
+Sugarcane,K0.00,K3.30,K6.50,K13.00
+Sweet Potato (Kaukau),K0.00,K1.30,K5.25,K10.50
+Tamarillo (tree tomato),K1.30,K2.60,K5.20,K9.00
+Tanget,K0.00,K0.40,K0.80,K1.60
+Tapa Cloth (used for blanket),K0.25,K0.70,K2.00,K4.00
+Tapa Cloth (used for clothing),K0.25,K0.40,K1.30,K2.60
+Tea,K0.40,K1.30,K3.30,K6.50
+Taro,K0.00,K0.65,K3.30,K6.60
+Taro (Kongkong),K0.00,K0.50,K2.60,K5.25
+Tobacco (Brus),K0.25,K0.70,K1.30,K2.60
+Tomato,K0.00,K0.25,K0.65,K1.30
+Tulip (edible leaves),K0.40,K0.70,K1.30,K4.00
+Valangur (Polyscias grandiflora),K0.30,K0.70,K1.30,K3.00
+Vanilla,K2.00,K5.25,K10.50,K19.50
+Vine Juice (used as local medicine),K0.25,K0.70,K1.30,K2.60
+Watermelon (vine),K0.00,K0.80,K2.60,K5.25
+Watercress (including similar creeping crops, eg Kangkong),,,,K3.15
+Wheat,,,,K0.20
+Yam,,,,K4.60
+Hardwood (all species except ebony & kwila),K0.00,K6.50,K13.00,K26.00
+Hardwood (ebony),K0.00,K40.00,K80.00,K160.00
+Hardwood (kwila),K0.00,K10.00,K40.00,K80.00
+Semi-Hardwood (all species),K0.00,K4.00,K8.00,K15.50
+Lesser known useful species,K0.00,K2.00,K5.00,K10.50
+All other trees,K0.00,K0.70,K2.00,K4.00
+Pine Tree,K0.00,K6.50,K26.00,K60.00
+Sandalwood,K0.00,K10.00,K40.00,K80.00
+Eaglewood (containing resin/gaharu),K0.00,K10.00,K40.00,K80.00
+Canoe Tree,K0.00,K13.00,K80.00,K160.00
+Garamut Tree,K0.00,K6.50,K26.00,K60.00
+Wild fowl (nesting mound),K0.00,K3.00,K7.00,K10.00`; 
+
+       const cropLines = cropData.split('\n').map(line => line.split(','));
+        const cropOptions = cropLines.map(line => line[0]);
+        const cropPrices = cropLines.reduce((obj, line) => {
+            obj[line[0]] = {
+                seedling: parseFloat(line[1].replace('K', '')),
+                small: parseFloat(line[2].replace('K', '')),
+                medium: parseFloat(line[3].replace('K', '')),
+                mature: parseFloat(line[4].replace('K', '')),
+            };
+            return obj;
+        }, {});
+
+        const cropSelect = document.getElementById('cropSelect');
+        cropOptions.forEach(option => {
+            const cropOption = document.createElement('option');
+            cropOption.text = option;
+            cropOption.value = option;
+            cropSelect.add(cropOption);
+        });
+
+        document.getElementById('cropForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const owner = document.getElementById('owner').value;
+            const cropName = document.getElementById('cropSelect').value;
+            const seedling = parseInt(document.getElementById('seedling').value);
+            const small = parseInt(document.getElementById('small').value);
+            const medium = parseInt(document.getElementById('medium').value);
+            const mature = parseInt(document.getElementById('mature').value);
+            const inflationRate = parseFloat(document.getElementById('inflationRate').value);
+
+            const subtotal = (seedling * cropPrices[cropName].seedling) +
+                             (small * cropPrices[cropName].small) +
+                             (medium * cropPrices[cropName].medium) +
+                             (mature * cropPrices[cropName].mature);
+            const total = inflationRate ? subtotal * (1 + inflationRate / 100) : subtotal;
+
+            const tableBody = document.getElementById('tableBody');
+            const newRow = tableBody.insertRow();
+            newRow.innerHTML = `
+                <td>${owner}</td>
+                <td>${cropName}</td>
+                <td>${seedling}</td>
+                <td>${small}</td>
+                <td>${medium}</td>
+                <td>${mature}</td>
+                <td>${total.toFixed(2)}</td>
+            `;
+
+            updateTotal();
+            this.reset();
+        });
+
+        document.getElementById('undoBtn').addEventListener('click', function() {
+            const tableBody = document.getElementById('tableBody');
+            if (tableBody.rows.length > 0) {
+                tableBody.deleteRow(-1);
+                updateTotal();
+            }
+        });
+
+        function updateTotal() {
+            const tableBody = document.getElementById('tableBody');
+            let total = 0;
+            for (let i = 0; i < tableBody.rows.length; i++) {
+                total += parseFloat(tableBody.rows[i].cells[6].textContent);
+            }
+            document.getElementById('totalCrops').textContent = total.toFixed(2);
+        }
+
+        document.getElementById('exportBtn').addEventListener('click', function() {
+            const table = document.getElementById('cropTable');
+            const rows = table.querySelectorAll('tr');
+            const csv = [];
+            for (let i = 0; i < rows.length; i++) {
+                const row = [], cols = rows[i].querySelectorAll('td, th');
+                for (let j = 0; j < cols.length; j++) {
+                    row.push(cols[j].textContent);
+                }
+                csv.push(row.join(','));
+            }
+            // Download CSV file
+            downloadCSV(csv.join('\n'), 'crops.csv');
+        });
+
+        function downloadCSV(csv, filename) {
+            const csvFile = new Blob([csv], { type: 'text/csv' });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(csvFile);
+            link.download = filename;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>

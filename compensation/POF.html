@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Past Occupancy Fee Calculator for Land Compensation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('pof2.jpg'); /* Replace 'your-image.jpg' with your image file path */
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .left, .right {
+            flex: 1;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.7); /* Slightly more transparent black background */
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 14px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #fff; /* White font color for better readability */
+            font-size: 12px; /* Smaller font size */
+        }
+
+        input[type="number"] {
+            width: calc(100% - 16px); /* Adjusted width */
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            text-align: left;
+            background-color: rgba(255, 255, 255, 0.8); /* Slightly more transparent white background */
+            font-size: 12px; /* Smaller font size */
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        input[readonly] {
+            background-color: rgba(249, 249, 249, 0.8); /* Slightly more transparent light gray background */
+        }
+
+        button.add-period {
+            display: block;
+            margin-top: 10px;
+            padding: 8px 20px;
+            background-color: #28a745; /* Green color for Add Period button */
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px; /* Smaller font size */
+        }
+
+        button.add-period:hover {
+            background-color: #218838; /* Darker green color on hover */
+        }
+
+        button.undo-period {
+            display: block;
+            margin-top: 10px;
+            padding: 8px 20px;
+            background-color: #dc3545; /* Red color for Undo button */
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px; /* Smaller font size */
+        }
+
+        button.undo-period:hover {
+            background-color: #c82333; /* Darker red color on hover */
+        }
+
+        .right {
+            color: #fff;
+            font-size: 14px;
+        }
+
+        p#result {
+            font-weight: bold;
+            text-align: center;
+            margin-top: 15px;
+            color: #007bff;
+        }
+
+        /* Styles for instructions */
+        #instructions {
+            max-width: 800px;
+            margin: 20px auto; /* Center the instructions form */
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.7); /* Slightly more transparent black background */
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+            color: #fff; /* White font color */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Choose suitable fonts */
+        }
+
+        /* Styles for the title */
+        h1 {
+            text-align: center;
+            color: #007bff; /* Primary color */
+            padding: 20px;
+        }
+
+        /* Styles for button container */
+        .button-container {
+            text-align: center; /* Center align the buttons */
+            margin-bottom: 20px; /* Add space below the buttons */
+        }
+
+        .button-container button {
+            margin: 0 10px; /* Add spacing between the buttons */
+            background-color: #007bff; /* Blue color for buttons */
+            color: #fff; /* White font color */
+            border: none;
+            border-radius: 4px;
+            padding: 8px 20px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .button-container button:hover {
+            background-color: #0056b3; /* Darker blue color on hover */
+        }
+        .past-occupancy{
+         padding: 20px;
+         margin-right: 100px;
+         margin-left: 700px;
+         text-align: center;
+          }
+ /* CSS styles for Excel export button */
+        #exportBtn {
+            width: 100%;
+            padding: 10px;
+            font-size: 18px;
+            background: #008CBA;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Past Occupancy Fee Calculator for Land Compensation</h1>
+
+    <!-- Button container -->
+    <div class="button-container">
+        <button onclick="window.open('interest_rates.html', '_blank')">Get Interest Rates</button>
+        <button onclick="window.open('cap_rate.html', '_blank')">Get Cap Rate for Economic Rental</button>
+        <button onclick="window.open('uvdetof.html', '_blank')">Calculate UV for Time Periods</button> <!-- Updated button to open new tab for the specified link -->
+    </div>
+
+    <!-- Instructions -->
+    <div id="instructions">
+        <h2>Instructions:</h2>
+        <ol>
+            <li>Enter the Unimproved Value (K) of the land.</li>
+            <li>Specify the Interest Rate (%) for the calculation.</li>
+            <li>Provide the Cap. Rate for Economic rental (%).</li>
+            <li>The Economic Rental per annum will be auto-calculated based on the Cap. Rate.</li>
+            <li>Enter the From Year and To Year to define the period.</li>
+            <li>The 'n' (Years Difference) field will be auto-calculated.</li>
+            <li>The FVAD Factor will be auto-updated.</li>
+            <li>The POF for that period will be calculated as you add more periods.</li>
+            <li>Click the "Add Period" button to add this period and reset the fields for the next entry.</li>
+        </ol>
+    </div>
+
+    <div class="container">
+        <!-- Left container for input fields -->
+        <div class="left">
+            <form class="occupancyCalculator">
+                <!-- Fields for the first period -->
+                <label for="unimprovedValue">Unimproved Value (K):</label>
+                <input type="number" id="unimprovedValue" name="unimprovedValue" step="0.01" required>
+
+                <label for="interestRate">Interest Rate (%):</label>
+                <input type="number" id="interestRate" name="interestRate" step="0.01" required>
+
+                <!-- Cap Rate Field -->
+                <label for="capRate">Cap. Rate for Economic rental (%):</label>
+                <input type="number" id="capRate" name="capRate" step="0.01" required>
+
+                <!-- Economic Rental Field -->
+                <label for="economicRental">Economic Rental per annum (auto-calculated):</label>
+                <input type="number" id="economicRental" name="economicRental" step="0.01" readonly>
+
+                <!-- Years Field -->
+                <label for="years">Years:</label>
+                <input type="number" id="fromYear" name="fromYear" placeholder="From" required>
+                <input type="number" id="toYear" name="toYear" placeholder="To" required>
+
+                <!-- 'n' Field -->
+                <label for="n">n (Years Difference):</label>
+                <input type="number" id="n" name="n" readonly>
+
+                <!-- FVAD Factor Field -->
+                <label for="futureValueOfAnnuity">FVAD Factor (auto-calculated):</label>
+                <input type="number" id="futureValueOfAnnuity" name="futureValueOfAnnuity" step="0.01" readonly>
+
+                <!-- POF for that period Field -->
+                <label for="pofForPeriod">POF for that period (auto-calculated):</label>
+                <input type="number" id="pofForPeriod" name="pofForPeriod" step="0.01" readonly>
+
+                <!-- Add Period and Undo buttons -->
+                <div class="button-box">
+                    <button class="add-period" type="button">Add Period</button>
+                    <button class="undo-period" type="button">Undo</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Right container for displayed information -->
+        <div class="right">
+            <div id="entered-info">
+                <h2 style="color: white;">POF Analysis</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Past Occupancy Fee Field (Final Result) -->
+    <div class="past-occupancy">
+        <label for="pastOccupancyFee" style="color: white;">Total Past Occupancy Fee (K):</label>
+        <input type="number" id="pastOccupancyFee" name="pastOccupancyFee" step="0.01" readonly style="background-color: rgba(0, 0, 0, 0.7); color: white;">
+    </div>
+
+<!-- Export to Excel button -->
+    <button id="exportBtn">Export to Excel</button>
+
+    <script>
+        // Initialize totalOccupationFee and periodCounter
+        let totalOccupationFee = 0;
+        let periodCounter = 1;
+
+        // Function to reset input fields for a new period
+        function resetFields() {
+            document.getElementById('unimprovedValue').value = '';
+            document.getElementById('interestRate').value = '';
+            document.getElementById('capRate').value = '';
+            document.getElementById('economicRental').value = '';
+            document.getElementById('fromYear').value = '';
+            document.getElementById('toYear').value = '';
+            document.getElementById('n').value = '';
+            document.getElementById('futureValueOfAnnuity').value = '';
+            document.getElementById('pofForPeriod').value = '';
+        }
+
+        // Function to add a new set of input fields for a new period
+        function addPeriod() {
+            displayEnteredInfo(); // Display entered information
+
+            const pofForPeriod = parseFloat(document.getElementById('pofForPeriod').value);
+            totalOccupationFee += pofForPeriod;
+
+            updatePastOccupancyFee(); // Update the Past Occupancy Fee
+            resetFields(); // Reset fields for a new period
+            periodCounter++;
+        }
+
+        // Function to undo the last added period
+        function undoPeriod() {
+            const enteredInfoDiv = document.getElementById('entered-info');
+            const infoParagraphs = enteredInfoDiv.getElementsByTagName('p');
+
+            if (infoParagraphs.length > 0) {
+                const lastInfoParagraph = infoParagraphs[infoParagraphs.length - 1];
+                const amountValue = parseFloat(lastInfoParagraph.getAttribute('data-amount'));
+
+                if (!isNaN(amountValue)) {
+                    totalOccupationFee -= amountValue;
+                    enteredInfoDiv.removeChild(lastInfoParagraph);
+                }
+            }
+
+            updatePastOccupancyFee(); // Update the Past Occupancy Fee
+        }
+
+        // Function to calculate 'n' (Years Difference) and the FVAD Factor
+        function calculate() {
+            // Get input values for the current period
+            const unimprovedValue = parseFloat(document.getElementById('unimprovedValue').value);
+            const interestRate = parseFloat(document.getElementById('interestRate').value) / 100; // Convert to decimal
+            const capRate = parseFloat(document.getElementById('capRate').value) / 100; // Convert to decimal
+            const fromYear = parseInt(document.getElementById('fromYear').value);
+            const toYear = parseInt(document.getElementById('toYear').value);
+
+            // Calculate 'n' (Years Difference)
+            const n = toYear - fromYear;
+            document.getElementById('n').value = n;
+
+            // Calculate Economic Rental based on the Cap Rate
+            const economicRental = capRate * unimprovedValue;
+
+            // Update the Economic Rental field
+            document.getElementById('economicRental').value = economicRental.toFixed(2);
+
+            // Calculate FVAD Factor
+            const fvadFactor = ((Math.pow(1 + interestRate, n) - 1) / interestRate) * (1 + interestRate);
+
+            // Update the FVAD Factor field
+            document.getElementById('futureValueOfAnnuity').value = fvadFactor.toFixed(2);
+
+            // Calculate POF for that period
+            const pofForPeriod = economicRental * fvadFactor;
+
+            // Update the POF for that period field
+            document.getElementById('pofForPeriod').value = pofForPeriod.toFixed(2);
+        }
+
+        // Function to update the Past Occupancy Fee based on the "POF for that period" values
+        function updatePastOccupancyFee() {
+            // Update the Past Occupancy Fee field
+            document.getElementById('pastOccupancyFee').value = totalOccupationFee.toFixed(2);
+        }
+
+        // Function to display entered information in the right corner
+        function displayEnteredInfo() {
+            const enteredInfoDiv = document.getElementById('entered-info');
+            const infoParagraph = document.createElement('p');
+            const fromYear = document.getElementById('fromYear').value;
+            const toYear = document.getElementById('toYear').value;
+            const unimprovedValue = document.getElementById('unimprovedValue').value;
+            const economicRental = document.getElementById('economicRental').value;
+            const capRate = document.getElementById('capRate').value;
+            const interestRate = document.getElementById('interestRate').value;
+            const pofForPeriod = document.getElementById('pofForPeriod').value;
+
+            infoParagraph.setAttribute('data-amount', pofForPeriod);
+            infoParagraph.innerText = `As at (${fromYear} to ${toYear}), UV for that period was K${unimprovedValue}, Economic rental was K${economicRental} which is ${capRate}% of the UV according to that period, interest rate at that time was ${interestRate}, using the FVAD formula we have an assessed past occupancy fee of K${pofForPeriod} for that period.`;
+            enteredInfoDiv.appendChild(infoParagraph);
+        }
+
+        // Add event listener to the "Add Period" button
+        const addPeriodButton = document.querySelector('.add-period');
+        addPeriodButton.addEventListener('click', addPeriod);
+
+        // Add event listener to the "Undo" button
+        const undoButton = document.querySelector('.undo-period');
+        undoButton.addEventListener('click', undoPeriod);
+
+        // Add event listeners to input fields for live updates
+        const inputFields = document.querySelectorAll('input[type="number"]');
+        inputFields.forEach(input => input.addEventListener('input', calculate));
+
+        // Initial calculation when the page loads
+        calculate();
+    </script>
+</body>
+</html>

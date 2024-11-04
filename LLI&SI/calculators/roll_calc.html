@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roll Assessment</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+</head>
+<body>
+
+<h1>Roll Assessment</h1>
+
+<h2>Proposed Lease Type</h2>
+<select id="leaseType">
+    <option value="Residential (H/C)">Residential (H/C)</option>
+    <option value="Residential (M/C)">Residential (M/C)</option>
+    <option value="Residential (L/C)">Residential (L/C)</option>
+    <option value="Business (Commercial)">Business (Commercial)</option>
+    <option value="Business (Light Industrial)">Business (Light Industrial)</option>
+    <option value="Business (General Industrial)">Business (General Industrial)</option>
+    <option value="Special Purpose">Special Purpose</option>
+    <option value="Agricultural">Agricultural</option>
+</select>
+
+<table id="dataTable">
+    <tr>
+        <th>Lot/Portion</th>
+        <th>Section/Milinch</th>
+        <th>Town/Fourmil</th>
+        <th>Lease Type</th>
+        <th>Land Area 
+            <select id="landUnit" onchange="convertLandUnits()">
+                <option value="sqm">sq.m</option>
+                <option value="ha">ha</option>
+            </select>
+        </th>
+        <th>Assessed UV (PGK)</th>
+        <th>Date Assessed</th>
+        <th>UV Rate 
+            <select id="rateUnit" onchange="convertRateUnits()">
+                <option value="ksqm">K/sqm</option>
+                <option value="kha">K/ha</option>
+            </select>
+        </th>
+    </tr>
+</table>
+
+<button type="button" onclick="addRow()">Add Row</button>
+<button type="button" onclick="saveRows()">Save Rows</button>
+
+<form id="rateForm">
+    <label for="adoptedRate">Adopted Rate:</label>
+    <input type="number" id="adoptedRate" name="adoptedRate" oninput="calculateValues()" required>
+
+    <label for="increasePerAnnum">Inc. Per Annum (%):</label>
+    <input type="number" id="increasePerAnnum" name="increasePerAnnum" oninput="calculateValues()" required>
+
+    <label for="yearFrom">Year From:</label>
+    <input type="number" id="yearFrom" name="yearFrom" oninput="calculateValues()" required>
+
+    <label for="yearTo">Year To:</label>
+    <input type="number" id="yearTo" name="yearTo" oninput="calculateValues()" required>
+
+    <label for="totalIncrease">Total % Inc.:</label>
+    <input type="text" id="totalIncrease" name="totalIncrease" readonly>
+
+    <label for="newUVRate">New UV Rate:</label>
+    <input type="text" id="newUVRate" name="newUVRate" readonly>
+
+    <label for="subjectLandArea">Subject Land Area:</label>
+    <input type="number" id="subjectLandArea" name="subjectLandArea" oninput="calculateValues()" required>
+
+    <label for="newUV">New UV:</label>
+    <input type="text" id="newUV" name="newUV" readonly>
+</form>
+
+<button type="button" onclick="displayInformation()">Display Information</button>
+
+<div id="analysisStatement"></div>
+
+<button type="button" onclick="exportToExcel()">Export to Excel</button>
+
+<script src="roll.js"></script>
+
+</body>
+</html>

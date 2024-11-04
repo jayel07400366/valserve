@@ -1,0 +1,99 @@
+﻿body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+.hero-section {
+  position: relative;
+  background-image: url('background/background-image.jpg'); /* Replace with your image file path */
+  background-size: cover;
+  background-position: center;
+  height: 100vh; /* Adjust height as needed */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #fff;
+}
+.hero-section h1 {
+  font-size: 3rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+.btn-container {
+  margin-top: 20px;
+}
+.btn-container a {
+  margin: 10px;
+  padding: 10px 20px;
+  text-decoration: none;
+  color: #fff;
+  background-color: #007bff; /* Bootstrap primary button color */
+  border: 1px solid #007bff;
+  border-radius: 4px;
+  transition: background-color 0.3s, color 0.3s;
+}
+.btn-container a:hover {
+  background-color: #0056b3; /* Darker shade of primary color on hover */
+  color: #fff;
+}
+/* Tooltip styles */
+.tooltip {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  display: none; /* Hide tooltip by default */
+  z-index: 999; /* Ensure tooltips appear above other content */
+  max-width: 200px; /* Adjust maximum width as needed */
+  white-space: nowrap; /* Prevent text wrapping */
+}
+/* Example tooltip styles for different faces */
+.tooltip-person1 {
+  top: 65%; /* Adjust top position */
+  left: 85%; /* Adjust left position */
+  transform: translate(-50%, -50%); /* Center the tooltip */
+}
+.tooltip-person2 {
+  top: 20%; /* Adjust top position */
+  left: 60%; /* Adjust left position */
+  transform: translate(-50%, -50%); /* Center the tooltip */
+}
+.tooltip-person3 {
+  top: 30%; /* Adjust top position */
+  left: 40%; /* Adjust left position */
+  transform: translate(-50%, -50%); /* Center the tooltip */
+}
+.tooltip-person4 {
+  top: 30%; /* Adjust top position */
+  left: 25%; /* Adjust left position */
+  transform: translate(-50%, -50%); /* Center the tooltip */
+}
+.tooltip-person5 {
+  top: 23%; /* Adjust top position */
+  left: 5%; /* Adjust left position */
+  transform: translate(-50%, -50%); /* Center the tooltip */
+}
+.tooltip-person6 {
+  top: 40%; /* Adjust top position */
+  left: 30%; /* Adjust left position */
+  transform: translate(-50%, -50%); /* Center the tooltip */
+}
+.tooltip-person7 {
+  top: 20%; /* Adjust top position */
+  left: 35%; /* Adjust left position */
+  transform: translate(-50%, -50%); /* Center the tooltip */
+}
+.tooltip-person8 {
+  top: 10%; /* Adjust top position */
+  left: 50%; /* Adjust left position */
+  transform: translate(-50%, -50%); /* Center the tooltip */
+}
+.tooltip-person9 {
+  top: 20%; /* Adjust top position */
+  left: 80%; /* Adjust left position */
+  transform: translate(-50%, -50%); /* Center the tooltip */
+}
+/* Add more tooltip styles as needed for other faces */

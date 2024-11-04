@@ -1,0 +1,38 @@
+﻿Restrictive License for Unimproved Calculators
+Copyright (c) 2024 Jeremy Aisa. 
+All rights reserved.
+Definitions
+
+"Software" refers to the Unimproved Calculators project and all associated code, documentation, and materials
+"Author" refers to Jeremy Aisa 
+"User" refers to any individual or entity using or accessing the Software
+
+Permissions
+Users are permitted to:
+
+Download and use the Software for personal and internal business purposes
+Modify the Software for personal use only
+Study the code for educational purposes
+Create and use private forks for personal development and bug fixes
+
+Restrictions
+Users are explicitly prohibited from:
+
+Redistributing the Software or any derivative works in any form
+Selling, sublicensing, or commercially exploiting the Software
+Creating public forks or distributing modified versions
+Using the Software's code in other projects, whether open-source or proprietary
+Removing or modifying this license notice from any part of the Software
+
+Additional Terms
+
+All bug fixes and improvements must be submitted to the original author for review and potential inclusion in the main project
+The Author reserves the right to incorporate any submitted modifications into the Software without compensation
+Any public mention or review of the Software must include attribution to the original Author and link to the official repository
+
+Disclaimer
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+Termination
+This license automatically terminates if you violate any of its terms. Upon termination, you must cease all use of the Software and destroy all copies in your possession.
+Contact
+For licensing inquiries or permission requests, contact jeremyaisa7@gmail.com.

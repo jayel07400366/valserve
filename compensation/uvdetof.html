@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Unimproved Value POF Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('pof2.jpg'); /* Replace 'background-image.jpg' with your image file */
+            background-size: cover;
+            background-position: center;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 400px;
+            margin: 20px auto;
+            background-color: rgba(0, 0, 0, 0.5); /* Black with 50% opacity */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Shadow effect */
+            color: #fff; /* Text color */
+            position: relative; /* Position relative for absolute positioning */
+        }
+        .input-container, .output-container {
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.7); /* Darker black with 70% opacity */
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .instructions {
+            font-size: 14px;
+            text-align: left;
+            color: #fff; /* Text color */
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #fff; /* Text color */
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: rgba(255, 255, 255, 0.8); /* White with 80% opacity */
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            margin-right: 10px; /* Added margin for spacing */
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        h1, h2, h3 {
+            color: #fff; /* Text color */
+        }
+        /* Style for message icon or button */
+        .message-icon {
+            position: absolute;
+            top: 20px; /* Adjust as needed */
+            left: 20px; /* Adjust as needed */
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            line-height: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .message-icon:hover {
+            background-color: #0056b3;
+        }
+        /* Style for message output */
+        .message-output {
+            position: absolute;
+            top: 80px; /* Adjust as needed */
+            left: 20px; /* Align with message icon */
+            background-color: rgba(0, 0, 0, 0.7); /* Darker black with 70% opacity */
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 300px; /* Limit width for neatness */
+            display: none; /* Initially hidden */
+        }
+        .message-output p {
+            color: #fff;
+            margin: 0 0 10px; /* Add margin for spacing between paragraphs */
+        }
+    </style>
+</head>
+<body>
+    <!-- Message icon or button -->
+    <button class="message-icon" onclick="toggleMessage()">📝</button>
+
+    <div class="container">
+        <h1>Unimproved Value POF Calculator</h1>
+        
+        <div class="instructions">
+            <h2>Instructions:</h2>
+            <ol>
+                <li>Enter the Unimproved Value in Kina (K).</li>
+                <li>Enter the Percentage Decrease in Unimproved Value as a percentage.</li>
+                <li>Enter the Period (From) in Years.</li>
+                <li>Enter the Period (To) in Years.</li>
+                <li>Click the "Print" button to calculate and display the results.</li>
+                <li>Use the "Undo" button to remove the last printed information if needed.</li>
+            </ol>
+        </div>
+
+        <div class="input-container">
+            <label for="unimprovedValue">Unimproved Value (K):</label>
+            <input type="number" id="unimprovedValue" name="unimprovedValue" oninput="updateUV()"><br>
+            
+            <label for="percentageDecrease">Percentage Decrease in Unimproved Value:</label>
+            <input type="number" id="percentageDecrease" name="percentageDecrease" oninput="updateUV()">%
+            
+            <label for="periodFrom">Period (From):</label>
+            <input type="number" id="periodFrom" name="periodFrom"><br>
+            
+            <label for="periodTo">Period (To):</label>
+            <input type="number" id="periodTo" name="periodTo"><br>
+            
+            <button onclick="printInfo()">Print</button>
+            <button onclick="undoPrint()">Undo</button>
+        </div>
+        
+        <div class="output-container">
+            <h2>Output</h2>
+            <div id="outputInfo"></div>
+        </div>
+    </div>
+
+    <!-- Message output -->
+    <div class="message-output" id="messageOutput">
+        <p>The Unimproved Value (UV) POF calculator serves a crucial purpose due to the limited historical data available specifically regarding UV assessments in the past. As such, to determine past UV assessments accurately, a methodical approach is required. The calculator operates by first computing the present UV, which provides a baseline value reflecting current conditions. Subsequently, this value is systematically discounted in percentages periodically, reflecting changes and influences over time. These percentage discounts are determined by the user's logical reasoning based within that period of time. By applying this method, the calculator enables a thorough assessment of past UV, despite the scarcity of direct historical data, ensuring robust and reliable evaluations in scenarios where such information is sparse or unavailable.</p>
+    </div>
+
+    <script>
+        var messageVisible = false;
+
+        function toggleMessage() {
+            var messageOutput = document.getElementById("messageOutput");
+            if (messageVisible) {
+                messageOutput.style.display = "none";
+                messageVisible = false;
+            } else {
+                messageOutput.style.display = "block";
+                messageVisible = true;
+            }
+        }
+
+        var periodCounter = 1;
+        var undoStack = [];
+
+        function updateUV() {
+            var unimprovedValue = parseFloat(document.getElementById("unimprovedValue").value);
+            var percentageDecrease = parseFloat(document.getElementById("percentageDecrease").value);
+            
+            if (!isNaN(unimprovedValue) && !isNaN(percentageDecrease)) {
+                var uvForPeriod = unimprovedValue - (percentageDecrease / 100) * unimprovedValue;
+                document.getElementById("uvForPeriod").value = uvForPeriod.toFixed(2);
+            }
+        }
+        
+        function printInfo() {
+            var unimprovedValue = parseFloat(document.getElementById("unimprovedValue").value);
+            var percentageDecrease = parseFloat(document.getElementById("percentageDecrease").value);
+            var periodFrom = parseFloat(document.getElementById("periodFrom").value);
+            var periodTo = parseFloat(document.getElementById("periodTo").value);
+
+            if (!isNaN(unimprovedValue) && !isNaN(percentageDecrease) && !isNaN(periodFrom) && !isNaN(periodTo)) {
+                var previousUV = unimprovedValue;
+                var decrease = (percentageDecrease / 100) * unimprovedValue;
+                var newUV = unimprovedValue - decrease;
+
+                var statement = "<h3>Period " + periodFrom + " to " + periodTo + ":</h3>";
+                statement += "<p>The previous UV was K" + previousUV.toFixed(2) + " , we have based on available information determined the market conditions between the year  " + periodFrom + " and  " + periodTo + " and reasonably adopted a " + percentageDecrease + "%  decrease to the previous UV, and hence the UV for that period would be K" + newUV.toFixed(2) + " (" + (percentageDecrease + "% of K" + previousUV.toFixed(2)) + ").</p>";
+
+                document.getElementById("outputInfo").innerHTML += statement;
+                periodCounter++;
+
+                // Push the printed information to the undo stack
+                undoStack.push(statement);
+
+                // Reset input fields
+                document.getElementById("unimprovedValue").value = "";
+                document.getElementById("percentageDecrease").value = "";
+                document.getElementById("periodFrom").value = "";
+                document.getElementById("periodTo").value = "";
+            }
+        }
+
+        function undoPrint() {
+            if (undoStack.length > 0) {
+                // Remove the last printed information
+                undoStack.pop();
+
+                // Display the updated information
+                document.getElementById("outputInfo").innerHTML = undoStack.join("");
+                
+                // Decrement the period counter
+                periodCounter--;
+
+                // Clear the last input values
+                document.getElementById("unimprovedValue").value = "";
+                document.getElementById("percentageDecrease").value = "";
+                document.getElementById("periodFrom").value = "";
+                document.getElementById("periodTo").value = "";
+            }
+        }
+    </script>
+</body>
+</html>

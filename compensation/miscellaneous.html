@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Miscellaneous Calculator</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-image: url('miscellaneuscalc.jpg'); /* Specify the path to your background image */
+    background-size: cover; /* Cover the entire background */
+    background-position: center; /* Center the background */
+  }
+  .calculator {
+    width: 300px;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #fff;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  }
+  .calculator label {
+    font-weight: bold;
+    color: #333;
+  }
+  .calculator input, .calculator select {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+  }
+  .calculator button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #27ae60; /* Dark green button */
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  .calculator button:hover {
+    background-color: #219653; /* Light green button on hover */
+  }
+  .calculator input[type="text"] {
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    border: none;
+    background-color: #f0f0f0;
+    cursor: default;
+    color: #333;
+  }
+  h2 {
+    font-family: 'Pacifico', cursive;
+    text-align: center;
+    color: #333;
+  }
+</style>
+</head>
+<body>
+
+<div class="calculator">
+  <h2>Miscellaneous Calculator</h2>
+  <label for="area">Area (in hectares or grave sites):</label>
+  <input type="number" id="area" step="0.01" min="0" oninput="calculateCost()">
+  <label for="type">Type:</label>
+  <select id="type" onchange="calculateCost()">
+    <option value="fish_pond">Man Made Fish Pond (K3.50/sqm)</option>
+    <option value="ceremonial_small">Ceremonial Grounds (1-5 hectares) (K1,700/ha)</option>
+    <option value="ceremonial_large">Ceremonial Grounds (Over 5 hectares) (K1,000/ha)</option>
+    <option value="sacred">Sacred Site (K900/ha)</option>
+    <option value="grave_unmarked">Grave Site (Unmarked) (K130/grave site)</option>
+    <option value="grave_marked">Grave Site (Marked) (K330/grave site)</option>
+    <option value="grave_permanent">Grave Site (with Permanent Features) (K1,300/grave site)</option>
+  </select>
+  <input type="text" id="result" readonly>
+</div>
+
+<script>
+  function calculateCost() {
+    const area = parseFloat(document.getElementById('area').value);
+    const type = document.getElementById('type').value;
+    let cost = 0;
+
+    switch (type) {
+      case 'fish_pond':
+        cost = 3.5 * area;
+        break;
+      case 'ceremonial_small':
+        if (area <= 5) {
+          cost = 1700 * area;
+        } else {
+          cost = 1700 * 5 + 1000 * (area - 5);
+        }
+        break;
+      case 'ceremonial_large':
+        cost = 1000 * area;
+        break;
+      case 'sacred':
+        cost = 900 * area;
+        break;
+      case 'grave_unmarked':
+        cost = 130 * area;
+        break;
+      case 'grave_marked':
+        cost = 330 * area;
+        break;
+      case 'grave_permanent':
+        cost = 1300 * area;
+        break;
+    }
+
+    // Replace NaN with 0.00
+    if (isNaN(cost)) {
+      cost = 0;
+    }
+
+    document.getElementById('result').value = "Total Cost: K " + cost.toFixed(2);
+  }
+</script>
+
+</body>
+</html>
